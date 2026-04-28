@@ -4,6 +4,13 @@ All notable changes to CivicProcure will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.1] - 2026-04-28
+
+### Changed
+
+- Aligned CivicProcure to `civiccore==0.3.0`.
+- Updated current-facing docs, release gate, CI wheel install, health/version tests, and browser QA evidence for the v0.1.1 compatibility release.
+
 ## [0.1.0] - 2026-04-27
 
 ### Added
