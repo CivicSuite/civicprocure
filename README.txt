@@ -3,7 +3,7 @@ CivicProcure
 
 CivicProcure is the CivicSuite module for procurement RFP drafting, proposal comparison, exception extraction, scoring summaries, board memo inputs, and award-packet checklists.
 
-Current state: v0.1.0 procurement support foundation release. It ships deterministic sample helpers and an accessible public sample UI at /civicprocure.
+Current state: v0.1.1 procurement support foundation release. It ships deterministic sample helpers and an accessible public sample UI at /civicprocure, aligned to civiccore==0.3.0.
 
 Not shipped: live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, or procurement system-of-record integrations.
 

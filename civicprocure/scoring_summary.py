@@ -1,4 +1,4 @@
-"""Scoring summary helpers for CivicProcure v0.1.0."""
+"""Scoring summary helpers for CivicProcure v0.1.1."""
 
 from __future__ import annotations
 

@@ -3,24 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CivicProcure — procurement support for CivicSuite</title>
+<title>CivicProcure - procurement support for CivicSuite</title>
 <style>
-body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background:linear-gradient(135deg,#fff7e6,#edf7ef)}main,header,footer{width:min(1080px,calc(100% - 32px));margin:auto}header{padding:56px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:#244f73;font-weight:800}h1{font:700 clamp(2.5rem,7vw,5.5rem)/.95 Georgia,serif;margin:.1em 0}.lede{font-size:1.25rem;line-height:1.6;max-width:820px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:rgba(255,255,255,.88);border:1px solid #dac7a4;border-radius:24px;padding:24px;box-shadow:0 18px 36px #26323b18}.badge{display:inline-block;background:#2f654c;color:white;padding:.5rem .8rem;border-radius:999px;font-weight:900}a{color:#244f73}:focus-visible{outline:4px solid #d8ad48;outline-offset:3px}@media(max-width:720px){.grid{grid-template-columns:1fr}header{padding-top:34px}}
+*{box-sizing:border-box}body{margin:0;font-family:"Aptos","Segoe UI",sans-serif;color:#17202a;background:linear-gradient(135deg,#fff7e6,#edf7ef)}main,header,footer{width:min(1080px,calc(100% - 32px));margin:auto}header{padding:56px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;color:#244f73;font-weight:800}h1{font:700 clamp(2.5rem,7vw,5.5rem)/.95 Georgia,serif;margin:.1em 0}.lede{font-size:1.25rem;line-height:1.6;max-width:820px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{background:rgba(255,255,255,.88);border:1px solid #dac7a4;border-radius:24px;padding:24px;box-shadow:0 18px 36px #26323b18}.badge{display:inline-block;background:#2f654c;color:white;padding:.5rem .8rem;border-radius:999px;font-weight:900}a{color:#244f73}:focus-visible{outline:4px solid #d8ad48;outline-offset:3px}@media(max-width:600px){main,header,footer{margin:0;max-width:390px;width:100%;padding-left:24px;padding-right:24px}header{padding-top:34px}h1{font-size:clamp(34px,11vw,46px)}.lede{font-size:19px}.grid{grid-template-columns:1fr}.card{padding:22px;border-radius:20px}}
 </style>
 </head>
 <body>
 <header>
   <p class="eyebrow">CivicSuite / CivicProcure</p>
   <h1>Procurement packets that survive the audit.</h1>
-  <p class="lede">CivicProcure v0.1.0 ships a foundation for RFP drafting, proposal comparison, exception extraction, scoring summaries, award-packet checklists, and an accessible sample UI.</p>
-  <p><span class="badge">Shipping v0.1.0</span></p>
+  <p class="lede">CivicProcure v0.1.1 ships a foundation for RFP drafting, proposal comparison, exception extraction, scoring summaries, award-packet checklists, and an accessible sample UI aligned to civiccore==0.3.0.</p>
+  <p><span class="badge">Shipping v0.1.1</span></p>
 </header>
 <main>
   <section class="grid">
     <article class="card"><h2>What ships</h2><ul><li>Sample RFP drafting.</li><li>Proposal comparison.</li><li>Exception extraction helper.</li><li>Scoring summary helper.</li><li>Award-packet checklist.</li><li>Public sample UI at <code>/civicprocure</code>.</li></ul></article>
     <article class="card"><h2>What does not ship</h2><p>CivicProcure does not evaluate vendors, award contracts, submit procurements, provide legal advice, call live LLMs, use live vendor portals, or replace the procurement system of record.</p></article>
     <article class="card"><h2>Repository</h2><p><a href="https://github.com/CivicSuite/civicprocure">github.com/CivicSuite/civicprocure</a></p></article>
-    <article class="card"><h2>Dependency</h2><p>Pinned to <code>civiccore==0.2.0</code>. CivicCore remains dependency-only; it never imports from CivicProcure.</p></article>
+    <article class="card"><h2>Dependency</h2><p>Pinned to <code>civiccore==0.3.0</code>. CivicCore remains dependency-only; it never imports from CivicProcure.</p></article>
   </section>
 </main>
 <footer><p>Apache 2.0 code. CC BY 4.0 docs. Run locally by the city.</p></footer>

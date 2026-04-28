@@ -1,9 +1,9 @@
-# Milestone 0-7 Done - CivicProcure v0.1.0 Foundation
+# Milestone 0-7 Done - CivicProcure v0.1.1 Foundation Alignment
 
 ## Completed
 
 - Repository, documentation, governance, and release scaffolding.
-- FastAPI runtime foundation pinned to `civiccore==0.2.0`.
+- FastAPI runtime foundation pinned to `civiccore==0.3.0` as of the v0.1.1 alignment release.
 - RFP drafting, proposal comparison, exception extraction, scoring summary, and award-packet helpers.
 - Public sample UI at `/civicprocure`.
 - Browser QA screenshots for the public UI and docs landing page.

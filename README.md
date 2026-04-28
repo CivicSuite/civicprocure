@@ -2,7 +2,7 @@
 
 CivicProcure is the CivicSuite module for procurement RFP drafting, proposal comparison, exception extraction, scoring summaries, board memo inputs, and award-packet checklists.
 
-Current state: **v0.1.0 procurement support foundation release**. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample RFP drafting, proposal comparison, exception extraction helper, scoring summary helper, award-packet checklist, and accessible public sample UI at `/civicprocure`. It does **not** ship live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, or procurement system-of-record integrations.
+Current state: **v0.1.1 procurement support foundation release**. This repo ships a FastAPI package, health/root endpoints, documentation gates, deterministic sample RFP drafting, proposal comparison, exception extraction helper, scoring summary helper, award-packet checklist, and accessible public sample UI at `/civicprocure`, aligned to `civiccore==0.3.0`. It does **not** ship live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, or procurement system-of-record integrations.
 
 ## What CivicProcure Does
 
@@ -18,7 +18,7 @@ Current state: **v0.1.0 procurement support foundation release**. This repo ship
 - It does not evaluate vendors.
 - It does not award contracts or submit procurements.
 - It does not provide legal advice.
-- It does not call live LLMs in v0.1.0.
+- It does not call live LLMs in v0.1.1.
 - It does not replace a procurement system of record.
 
 ## API Surface
