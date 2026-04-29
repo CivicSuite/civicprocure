@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Aligned CivicProcure to `civiccore==0.3.0`.
 - Updated current-facing docs, release gate, CI wheel install, health/version tests, and browser QA evidence for the v0.1.1 compatibility release.
+- Added optional SQLAlchemy-backed RFP draft and award-packet workpaper persistence behind `CIVICPROCURE_WORKPAPER_DB_URL`, with retrieval endpoints and actionable setup errors.
 
 ## [0.1.0] - 2026-04-27
 

@@ -19,6 +19,7 @@ def test_root_endpoint_states_runtime_boundary() -> None:
     assert payload["name"] == "CivicProcure"
     assert payload["version"] == "0.1.1"
     assert payload["status"] == "procurement support foundation"
+    assert "database-backed RFP/award workpapers" in payload["message"]
     assert "official vendor evaluation decisions" in payload["message"]
     assert "not implemented yet" in payload["message"]
     assert payload["next_step"].startswith("Post-v0.1.1 roadmap")
