@@ -33,6 +33,7 @@ required=(
   "civicprocure/exception_extract.py"
   "civicprocure/scoring_summary.py"
   "civicprocure/award_packet.py"
+  "civicprocure/persistence.py"
   "civicprocure/public_ui.py"
 )
 
