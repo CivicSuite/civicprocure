@@ -6,7 +6,7 @@ For Non-Technical Users
 
 CivicProcure helps city staff keep solicitation drafts, proposal notes, exception flags, scoring summaries, staff review queues, board memo inputs, CivicClerk/CivicContracts context references, and award-packet records organized.
 
-Current state: 1.0.0 procurement support and staff review queue runtime. CivicProcure can optionally save generated RFP drafts, award-packet checklists, and staff review queue records when IT configures CIVICPROCURE_WORKPAPER_DB_URL. Staff-only review routes also require CIVICPROCURE_STAFF_API_KEY.
+Current state: 0.2.0 procurement support and staff review queue runtime. CivicProcure can optionally save generated RFP drafts, award-packet checklists, and staff review queue records when IT configures CIVICPROCURE_WORKPAPER_DB_URL. Staff-only review routes also require CIVICPROCURE_STAFF_API_KEY.
 
 CivicProcure does not provide official vendor evaluation decisions, legal advice, live vendor portals, live LLM calls, e-procurement submission portals, award decisions, or procurement system-of-record updates. Staff own every decision.
 
@@ -25,4 +25,4 @@ bash scripts/verify-release.sh
 Architecture
 ------------
 
-CivicProcure depends on CivicCore. CivicCore does not depend on CivicProcure. CivicProcure v1.0.0 uses deterministic sample procurement data plus optional staff-gated persistence, review-required context packets for CivicClerk/CivicContracts references, staff review queue records, and adversarial local mocks for integration-depth validation.
+CivicProcure depends on CivicCore. CivicCore does not depend on CivicProcure. CivicProcure v0.2.0 uses deterministic sample procurement data plus optional staff-gated persistence, review-required context packets for CivicClerk/CivicContracts references, staff review queue records, and adversarial local mocks for integration-depth validation.

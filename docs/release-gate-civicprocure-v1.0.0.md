@@ -1,10 +1,10 @@
-# CivicProcure v1.0.0 Release Gate
+# CivicProcure v0.2.0 Release Gate
 
 Date: 2026-05-09
 
 ## Scope
 
-CivicProcure v1.0.0 productization for procurement support, staff review queues, review-required CivicClerk/CivicContracts context packets, adversarial local integration mocks, CivicCore v1.0.0 release-wheel alignment, docs, tests, browser QA, and release artifacts.
+CivicProcure v0.2.0 productization for procurement support, staff review queues, review-required CivicClerk/CivicContracts context packets, adversarial local integration mocks, CivicCore v1.0.0 release-wheel alignment, docs, tests, browser QA, and release artifacts.
 
 ## Internal Careful-Work Evidence
 

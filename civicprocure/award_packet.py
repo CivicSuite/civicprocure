@@ -1,4 +1,4 @@
-"""Award-packet export helpers for CivicProcure v1.0.0."""
+"""Award-packet export helpers for CivicProcure v0.2.0."""
 
 from __future__ import annotations
 
