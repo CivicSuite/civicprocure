@@ -1,4 +1,4 @@
-"""Deterministic RFP drafting helpers for CivicProcure v0.1.1."""
+"""Deterministic RFP drafting helpers for CivicProcure v1.0.0."""
 
 from __future__ import annotations
 

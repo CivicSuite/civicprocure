@@ -33,6 +33,7 @@ required=(
   "civicprocure/exception_extract.py"
   "civicprocure/scoring_summary.py"
   "civicprocure/award_packet.py"
+  "civicprocure/integration_mocks.py"
   "civicprocure/persistence.py"
   "civicprocure/public_ui.py"
 )
@@ -53,6 +54,7 @@ bad_markers=(
   "live vendor portals are available"
   "live LLM calls are available"
   "e-procurement submission portals are available"
+  "award decisions are available"
   "system-of-record integrations are available"
   "production staff-review queues are available"
 )

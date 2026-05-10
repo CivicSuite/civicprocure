@@ -1,6 +1,5 @@
 # Security
 
-CivicProcure is early-stage software. Current version: `0.1.1`. Do not deploy it as a system of record until a release explicitly says it is production-ready.
+CivicProcure is open-source municipal software. Current version: `1.0.0`. Do not deploy it as a procurement system of record; CivicProcure provides staff-reviewed procurement support only.
 
 Report suspected vulnerabilities privately to the project maintainer. Do not open public issues containing exploit details, secrets, or sensitive municipal data.
-

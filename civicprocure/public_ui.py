@@ -1,4 +1,4 @@
-"""Static public UI shell for CivicProcure v0.1.1."""
+"""Static public UI shell for CivicProcure v1.0.0."""
 
 from __future__ import annotations
 
@@ -46,8 +46,8 @@ def render_public_lookup_page() -> str:
 <header>
   <p class="eyebrow">CivicSuite / CivicProcure public sample</p>
   <h1>Turn procurement packets into reviewable public records.</h1>
-  <p class="lede">CivicProcure demonstrates procurement support: RFP outlines, proposal comparison scaffolds, exception flags, scoring summaries, board memo inputs, and award-packet checklists without evaluating vendors or making award decisions.</p>
-  <p><span class="badge">v0.1.1 procurement support foundation</span></p>
+  <p class="lede">CivicProcure demonstrates procurement support: RFP outlines, proposal comparison scaffolds, exception flags, scoring summaries, staff review queues, context packets, board memo inputs, and award-packet checklists without evaluating vendors or making award decisions.</p>
+  <p><span class="badge">v1.0.0 procurement support + staff review queues</span></p>
 </header>
 <main id="main" tabindex="-1">
   <section class="grid" aria-labelledby="lookup-title">
@@ -61,10 +61,10 @@ def render_public_lookup_page() -> str:
         <ul><li>Recommended owner: Department lead + Legal + Purchasing.</li><li>Compare responsiveness, exceptions, price factors, and review notes.</li><li>Preserve solicitation, proposal register, scoring worksheets, board memo, and award action.</li></ul>
       </div>
     </article>
-    <article class="card"><p class="kicker">Comparison</p><h2>Factors, not decisions</h2><div class="result"><p>CivicProcure can scaffold proposal comparison rows, but staff must perform the actual vendor evaluation.</p></div></article>
+    <article class="card"><p class="kicker">Comparison</p><h2>Factors, not decisions</h2><div class="result"><p>CivicProcure can scaffold proposal comparison rows and route review work to staff, but staff must perform the actual vendor evaluation.</p></div></article>
     <article class="card"><p class="kicker">Exceptions</p><h2>Flag first</h2><div class="result"><p>Exception helpers identify common indemnity, insurance, confidentiality, and deviation language for staff and legal review.</p></div></article>
     <article class="card"><p class="kicker">Award packet</p><h2>Preserve provenance</h2><div class="result"><p>Exports preserve solicitation, addenda, proposal register, evaluation worksheets, staff recommendation, board action, agreement, and retention notes.</p></div></article>
-    <article class="card large"><p class="kicker">Boundary</p><h2>No official procurement action</h2><div class="result warning"><p>CivicProcure does not evaluate vendors, award contracts, provide legal advice, call live LLMs, submit procurements, or replace the procurement system of record.</p></div></article>
+    <article class="card large"><p class="kicker">Boundary</p><h2>No official procurement action</h2><div class="result warning"><p>CivicProcure does not evaluate vendors, award contracts, make award decisions, provide legal advice, call live LLMs, use live vendor portals, submit procurements, or replace the procurement system of record.</p></div></article>
   </section>
 </main>
 <footer><p>CivicProcure is part of the Apache 2.0 CivicSuite open-source municipal AI project.</p></footer>
