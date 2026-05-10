@@ -4,7 +4,7 @@
 
 CivicProcure helps city staff keep solicitation drafts, proposal notes, exception flags, scoring summaries, staff review queues, board memo inputs, CivicClerk/CivicContracts context references, and award-packet records organized. It can draft an RFP outline, scaffold proposal comparison rows, flag common exception language, build a scoring summary, and assemble an award-packet checklist.
 
-Current state: `1.0.0` procurement support and staff review queue runtime. CivicProcure can optionally save generated RFP drafts, award-packet checklists, and staff review queue records when IT configures a workpaper database. Staff-only review routes also require `CIVICPROCURE_STAFF_API_KEY`. CivicProcure does not provide official vendor evaluation decisions, legal advice, live vendor portals, live LLM calls, e-procurement submission portals, award decisions, or procurement system-of-record updates. Staff own every decision.
+Current state: 0.2.0 procurement support and staff review queue runtime. CivicProcure can optionally save generated RFP drafts, award-packet checklists, and staff review queue records when IT configures a workpaper database. Staff-only review routes also require `CIVICPROCURE_STAFF_API_KEY`. CivicProcure does not provide official vendor evaluation decisions, legal advice, live vendor portals, live LLM calls, e-procurement submission portals, award decisions, or procurement system-of-record updates. Staff own every decision.
 
 ## For IT and Technical Staff
 
@@ -42,7 +42,7 @@ bash scripts/verify-release.sh
 
 ```mermaid
 flowchart LR
-  Staff["Purchasing / finance / department leads"] --> CivicProcure["CivicProcure v1.0.0"]
+  Staff["Purchasing / finance / department leads"] --> CivicProcure["CivicProcure v0.2.0"]
   CivicProcure --> CivicCore["CivicCore v1.0.0"]
   CivicProcure -. released context ID .-> CivicClerk["CivicClerk v1.0.0"]
   CivicProcure -. future context ID .-> CivicContracts["CivicContracts"]
@@ -51,4 +51,4 @@ flowchart LR
   CivicProcure --> Export["Award packet checklist"]
 ```
 
-CivicProcure depends on CivicCore. CivicCore does not depend on CivicProcure. CivicProcure v1.0.0 uses deterministic sample procurement data plus optional staff-gated persistence, review-required context packets for CivicClerk/CivicContracts references, staff review queue records, and adversarial local mocks for integration-depth validation.
+CivicProcure depends on CivicCore. CivicCore does not depend on CivicProcure. CivicProcure v0.2.0 uses deterministic sample procurement data plus optional staff-gated persistence, review-required context packets for CivicClerk/CivicContracts references, staff review queue records, and adversarial local mocks for integration-depth validation.

@@ -9,10 +9,10 @@
 ## Hard Boundaries
 
 - CivicProcure never evaluates vendors, awards contracts, submits procurements, provides legal advice, or updates a procurement system of record.
-- CivicProcure v1.0.0 must not call live LLMs or live vendor portals.
+- CivicProcure v0.2.0 must not call live LLMs or live vendor portals.
 - Proposal comparisons, exception flags, scoring summaries, and award packets must be marked staff-review-required where applicable.
 - CivicProcure depends on CivicCore; CivicCore must never depend on CivicProcure.
-- CivicProcure may reference CivicClerk, CivicContracts, and CivicRecords concepts only through released contracts, context IDs, or deterministic sample data in v1.0.0.
+- CivicProcure may reference CivicClerk, CivicContracts, and CivicRecords concepts only through released contracts, context IDs, or deterministic sample data in this recovery release.
 
 ## Verification
 

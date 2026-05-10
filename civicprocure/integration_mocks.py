@@ -36,7 +36,7 @@ def validate_procurement_context_mocks(payload: dict[str, Any]) -> IntegrationMo
     if payload.get("legal_advice") is True:
         findings.append("Rejected legal-advice claim in procurement integration context.")
     if payload.get("vendor_portal_source") == "live":
-        findings.append("Rejected live vendor-portal claim; v1.0.0 uses local deterministic context only.")
+        findings.append("Rejected live vendor-portal claim; v0.2.0 uses local deterministic context only.")
     if payload.get("source_date_status") == "stale":
         findings.append("Stale procurement context requires staff refresh before comparison or award packets.")
 
@@ -49,6 +49,6 @@ def validate_procurement_context_mocks(payload: dict[str, Any]) -> IntegrationMo
         boundary=(
             "CivicProcure validates local integration context only; it does not call live "
             "CivicClerk, CivicContracts, vendor portal, LLM, legal, award, submission, "
-            "or procurement system-of-record services in v1.0.0."
+            "or procurement system-of-record services in this recovery release."
         ),
     )
