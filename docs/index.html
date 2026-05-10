@@ -12,15 +12,15 @@
 <header>
   <p class="eyebrow">CivicSuite / CivicProcure</p>
   <h1>Procurement packets that survive the audit.</h1>
-  <p class="lede">CivicProcure v0.1.1 ships a foundation for RFP drafting, proposal comparison, exception extraction, scoring summaries, award-packet checklists, optional database-backed RFP/award workpapers, and an accessible sample UI aligned to civiccore==0.3.0.</p>
-  <p><span class="badge">Shipping v0.1.1</span></p>
+  <p class="lede">CivicProcure v1.0.0 ships RFP drafting, proposal comparison, exception extraction, scoring summaries, award-packet checklists, optional database-backed workpapers, staff review queues, review-required context packets, adversarial local mocks, and an accessible sample UI.</p>
+  <p><span class="badge">Shipping v1.0.0</span></p>
 </header>
 <main>
   <section class="grid">
-    <article class="card"><h2>What ships</h2><ul><li>Sample RFP drafting.</li><li>Proposal comparison.</li><li>Exception extraction helper.</li><li>Scoring summary helper.</li><li>Award-packet checklist.</li><li>Optional RFP/award workpaper persistence.</li><li>Public sample UI at <code>/civicprocure</code>.</li></ul></article>
-    <article class="card"><h2>What does not ship</h2><p>CivicProcure does not evaluate vendors, award contracts, submit procurements, provide legal advice, call live LLMs, use live vendor portals, or replace the procurement system of record.</p></article>
+    <article class="card"><h2>What ships</h2><ul><li>Sample RFP drafting.</li><li>Proposal comparison.</li><li>Exception extraction helper.</li><li>Scoring summary helper.</li><li>Award-packet checklist.</li><li>Optional RFP/award workpaper persistence.</li><li>Staff queue routes protected by <code>CIVICPROCURE_STAFF_API_KEY</code>.</li><li>Review-required CivicClerk and CivicContracts context packets.</li><li>Adversarial local integration mocks.</li><li>Public sample UI at <code>/civicprocure</code>.</li></ul></article>
+    <article class="card"><h2>What does not ship</h2><p>CivicProcure does not evaluate vendors, award contracts, make award decisions, submit procurements, provide legal advice, call live LLMs, use live vendor portals, or replace the procurement system of record.</p></article>
     <article class="card"><h2>Repository</h2><p><a href="https://github.com/CivicSuite/civicprocure">github.com/CivicSuite/civicprocure</a></p></article>
-    <article class="card"><h2>Dependency</h2><p>Pinned to <code>civiccore==0.3.0</code>. CivicCore remains dependency-only; it never imports from CivicProcure.</p></article>
+    <article class="card"><h2>Dependency</h2><p>Pinned to the published <code>civiccore v1.0.0</code> release wheel. CivicCore remains dependency-only; it never imports from CivicProcure.</p></article>
   </section>
 </main>
 <footer><p>Apache 2.0 code. CC BY 4.0 docs. Run locally by the city.</p></footer>

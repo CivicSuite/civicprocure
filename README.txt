@@ -1,24 +1,20 @@
 CivicProcure
-============
+=============
 
-CivicProcure is the CivicSuite module for procurement RFP drafting, proposal comparison, exception extraction, scoring summaries, board memo inputs, and award-packet checklists.
+CivicProcure is the CivicSuite module for procurement RFP drafting, proposal comparison, exception extraction, scoring summaries, board memo inputs, staff review queues, review-required CivicClerk/CivicContracts context packets, adversarial local integration mocks, and award-packet checklists.
 
-Current state: v0.1.1 procurement support foundation release. It ships deterministic sample helpers, optional database-backed RFP/award workpapers, and an accessible public sample UI at /civicprocure, aligned to civiccore==0.3.0.
+Current state: v1.0.0 procurement support and staff review queue runtime. It ships a FastAPI package aligned to the published CivicCore v1.0.0 release wheel, deterministic and database-backed RFP drafting, award-packet workpapers, staff-only review queue workflows, review-required context packets, adversarial local integration mocks, proposal comparison scaffolds, exception extraction, scoring summary helper, award-packet checklist, and accessible public sample UI at /civicprocure.
 
-Not shipped: live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, or procurement system-of-record integrations.
+It does not evaluate vendors, award contracts, make award decisions, submit procurements, provide legal advice, call live LLMs, call live vendor portals, or replace a procurement system of record.
 
-API surface:
-- GET /
-- GET /health
-- GET /civicprocure
-- POST /api/v1/civicprocure/rfps/draft
-- GET /api/v1/civicprocure/rfps/draft/{draft_id}
-- POST /api/v1/civicprocure/proposals/compare
-- POST /api/v1/civicprocure/proposals/exceptions
-- POST /api/v1/civicprocure/scoring/summary
-- POST /api/v1/civicprocure/award-packet
-- GET /api/v1/civicprocure/award-packet/{packet_id}
+Staff routes require CIVICPROCURE_WORKPAPER_DB_URL plus CIVICPROCURE_STAFF_API_KEY and trusted headers:
 
-Optional workpaper persistence: set CIVICPROCURE_WORKPAPER_DB_URL to a SQLAlchemy database URL to store generated RFP drafts and award-packet checklists. Without that variable, POST endpoints stay stateless and GET retrieval endpoints return an actionable setup message.
+- X-CivicProcure-Role: staff or service
+- X-CivicProcure-Staff-Key: configured staff key
 
-License: code Apache License 2.0; documentation CC BY 4.0.
+Local development:
+
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
+python -m pip install -e ".[dev]"
+python -m pytest -q
+bash scripts/verify-release.sh

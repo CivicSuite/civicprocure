@@ -1,21 +1,25 @@
 """FastAPI runtime foundation for CivicProcure."""
 
 import os
+from typing import Annotated
 
 from civiccore import __version__ as CIVICCORE_VERSION
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from civicprocure import __version__
 from civicprocure.award_packet import build_award_packet_checklist
 from civicprocure.exception_extract import extract_proposal_exceptions
+from civicprocure.integration_mocks import validate_procurement_context_mocks
 from civicprocure.proposal_compare import compare_proposals
 from civicprocure.public_ui import render_public_lookup_page
 from civicprocure.rfp_draft import draft_rfp_outline
 from civicprocure.scoring_summary import build_scoring_summary
 from civicprocure.persistence import (
     ProcureWorkpaperRepository,
+    StaffReviewQueueItem,
+    StaffReviewSummary,
     StoredAwardPacket,
     StoredRfpDraft,
 )
@@ -58,6 +62,41 @@ class AwardPacketRequest(BaseModel):
     format: str = "markdown"
 
 
+class ProcurementContextRequest(BaseModel):
+    solicitation_id: str
+    procurement_title: str
+    solicitation_context_id: str = ""
+    clerk_context_id: str = ""
+    contract_context_id: str = ""
+    source_date_status: str = "current"
+
+
+class IntegrationMockRequest(BaseModel):
+    scenario: str = "procurement-context"
+    role: str = "staff"
+    solicitation_context_id: str = ""
+    clerk_context_id: str = ""
+    contract_context_id: str = ""
+    official_vendor_evaluation: bool = False
+    award_decision: bool = False
+    procurement_submitted: bool = False
+    legal_advice: bool = False
+    vendor_portal_source: str = "local"
+    source_date_status: str = "current"
+
+
+class StaffReviewCreateRequest(BaseModel):
+    procurement_title: str
+    reason: str
+    solicitation_id: str | None = None
+
+
+class StaffReviewUpdateRequest(BaseModel):
+    status: str
+    assigned_to: str | None = None
+    resolution: str | None = None
+
+
 @app.get("/")
 def root() -> dict[str, str]:
     """Return current product state without overstating unshipped behavior."""
@@ -69,12 +108,13 @@ def root() -> dict[str, str]:
         "message": (
             "CivicProcure package, API foundation, sample RFP drafting, proposal comparison, "
             "exception extraction helper, scoring summary helper, award-packet checklist, "
-            "optional database-backed RFP/award workpapers, and public UI foundation are online; "
+            "optional database-backed RFP/award workpapers, staff review queues, review-required "
+            "CivicClerk/CivicContracts context packets, adversarial local integration mocks, and public UI foundation are online; "
             "live vendor portals, official vendor evaluation decisions, "
-            "legal advice, live LLM calls, e-procurement submission portals, and procurement system-of-record integrations "
-            "are not implemented yet."
+            "legal advice, live LLM calls, e-procurement submission portals, award decisions, and procurement system-of-record integrations "
+            "are not implemented."
         ),
-        "next_step": "Post-v0.1.1 roadmap: local procurement template configuration, CivicContracts links, and staff review queues",
+        "next_step": "Configure CIVICPROCURE_WORKPAPER_DB_URL and CIVICPROCURE_STAFF_API_KEY before using staff queues.",
     }
 
 
@@ -100,13 +140,18 @@ def public_civicprocure_page() -> str:
 @app.post("/api/v1/civicprocure/rfps/draft")
 def rfp_draft(request: RfpDraftRequest) -> dict[str, object]:
     if _workpaper_database_url() is not None:
-        return _stored_rfp_response(
-            _get_workpaper_repository().create_rfp_draft(
-                procurement_title=request.procurement_title,
-                procurement_type=request.procurement_type,
-                city_need=request.city_need,
-            )
+        stored = _get_workpaper_repository().create_rfp_draft(
+            procurement_title=request.procurement_title,
+            procurement_type=request.procurement_type,
+            city_need=request.city_need,
         )
+        staff_review = _get_workpaper_repository().create_staff_review_queue_item(
+            procurement_title=stored.procurement_title,
+            solicitation_id=stored.draft_id,
+            reason="RFP draft requires staff review before publication, proposal evaluation, or award action.",
+            created_by="staff",
+        )
+        return _stored_rfp_response(stored, staff_review=staff_review)
     result = draft_rfp_outline(
         procurement_title=request.procurement_title,
         procurement_type=request.procurement_type,
@@ -114,6 +159,7 @@ def rfp_draft(request: RfpDraftRequest) -> dict[str, object]:
     )
     payload = result.__dict__
     payload["draft_id"] = None
+    payload["staff_review_id"] = None
     return payload
 
 
@@ -169,13 +215,18 @@ def scoring_summary(request: ScoringSummaryRequest) -> dict[str, object]:
 @app.post("/api/v1/civicprocure/award-packet")
 def award_packet(request: AwardPacketRequest) -> dict[str, object]:
     if _workpaper_database_url() is not None:
-        return _stored_award_packet_response(
-            _get_workpaper_repository().create_award_packet(
-                solicitation_id=request.solicitation_id,
-                title=request.title,
-                format=request.format,
-            )
+        stored = _get_workpaper_repository().create_award_packet(
+            solicitation_id=request.solicitation_id,
+            title=request.title,
+            format=request.format,
         )
+        staff_review = _get_workpaper_repository().create_staff_review_queue_item(
+            procurement_title=stored.title,
+            solicitation_id=stored.solicitation_id,
+            reason="Award packet requires staff review before governing-body action or contract routing.",
+            created_by="staff",
+        )
+        return _stored_award_packet_response(stored, staff_review=staff_review)
     result = build_award_packet_checklist(
         solicitation_id=request.solicitation_id,
         title=request.title,
@@ -183,6 +234,7 @@ def award_packet(request: AwardPacketRequest) -> dict[str, object]:
     )
     payload = result.__dict__
     payload["packet_id"] = None
+    payload["staff_review_id"] = None
     return payload
 
 
@@ -208,8 +260,131 @@ def get_award_packet(packet_id: str) -> dict[str, object]:
     return _stored_award_packet_response(stored)
 
 
+@app.post("/api/v1/civicprocure/context/procurement-review")
+def procurement_review_context(request: ProcurementContextRequest) -> dict[str, object]:
+    rfp = draft_rfp_outline(
+        procurement_title=request.procurement_title,
+        procurement_type="general",
+    )
+    citations = [f"Procurement draft context: {rfp.recommended_owner}"]
+    if request.solicitation_context_id:
+        citations.append(f"Solicitation context: {request.solicitation_context_id}")
+    if request.clerk_context_id:
+        citations.append(f"CivicClerk context: {request.clerk_context_id}")
+    if request.contract_context_id:
+        citations.append(f"CivicContracts context: {request.contract_context_id}")
+    return {
+        "solicitation_id": request.solicitation_id.strip() or "unassigned-solicitation",
+        "procurement_title": request.procurement_title.strip() or "Untitled procurement",
+        "solicitation_context_id": request.solicitation_context_id,
+        "clerk_context_id": request.clerk_context_id,
+        "contract_context_id": request.contract_context_id,
+        "source_date_status": request.source_date_status,
+        "citations": citations,
+        "recommended_owner": rfp.recommended_owner,
+        "review_required": True,
+        "boundary": (
+            "CivicProcure provides procurement review context only; it is not an official vendor "
+            "evaluation, award decision, legal opinion, procurement submission, live vendor-portal "
+            "result, or procurement system-of-record action."
+        ),
+    }
+
+
+@app.post("/api/v1/civicprocure/integrations/mock/procurement-context")
+def integration_mock_procurement_context(request: IntegrationMockRequest) -> dict[str, object]:
+    result = validate_procurement_context_mocks(request.model_dump())
+    return {
+        "scenario": result.scenario,
+        "status": result.status,
+        "review_required": result.review_required,
+        "findings": list(result.findings),
+        "boundary": result.boundary,
+    }
+
+
+@app.post("/api/v1/civicprocure/staff/reviews")
+def create_staff_review(
+    request: StaffReviewCreateRequest,
+    x_civicprocure_role: Annotated[str | None, Header()] = None,
+    x_civicprocure_staff_key: Annotated[str | None, Header()] = None,
+) -> dict[str, object]:
+    _require_persistence_configured()
+    _require_staff_role(x_civicprocure_role, x_civicprocure_staff_key)
+    item = _get_workpaper_repository().create_staff_review_queue_item(
+        procurement_title=request.procurement_title,
+        solicitation_id=request.solicitation_id,
+        reason=request.reason,
+        created_by=x_civicprocure_role or "staff",
+    )
+    return _staff_review_payload(item)
+
+
+@app.get("/api/v1/civicprocure/staff/reviews")
+def list_staff_reviews(
+    status: str | None = None,
+    x_civicprocure_role: Annotated[str | None, Header()] = None,
+    x_civicprocure_staff_key: Annotated[str | None, Header()] = None,
+) -> dict[str, object]:
+    _require_persistence_configured()
+    _require_staff_role(x_civicprocure_role, x_civicprocure_staff_key)
+    return {
+        "visibility": "staff_only",
+        "items": [
+            _staff_review_payload(item)
+            for item in _get_workpaper_repository().list_staff_review_queue_items(status=status)
+        ],
+    }
+
+
+@app.patch("/api/v1/civicprocure/staff/reviews/{review_id}")
+def update_staff_review(
+    review_id: str,
+    request: StaffReviewUpdateRequest,
+    x_civicprocure_role: Annotated[str | None, Header()] = None,
+    x_civicprocure_staff_key: Annotated[str | None, Header()] = None,
+) -> dict[str, object]:
+    _require_persistence_configured()
+    _require_staff_role(x_civicprocure_role, x_civicprocure_staff_key)
+    try:
+        item = _get_workpaper_repository().update_staff_review_queue_item(
+            review_id=review_id,
+            status=request.status,
+            assigned_to=request.assigned_to,
+            resolution=request.resolution,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={"message": "Staff review update is invalid.", "fix": str(exc)},
+        ) from exc
+    if item is None:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "message": "CivicProcure staff review item was not found.",
+                "fix": "List staff reviews and retry with an existing review_id.",
+            },
+        )
+    return _staff_review_payload(item)
+
+
+@app.get("/api/v1/civicprocure/staff/reviews/summary")
+def staff_review_summary(
+    x_civicprocure_role: Annotated[str | None, Header()] = None,
+    x_civicprocure_staff_key: Annotated[str | None, Header()] = None,
+) -> dict[str, object]:
+    _require_persistence_configured()
+    _require_staff_role(x_civicprocure_role, x_civicprocure_staff_key)
+    return _staff_review_summary_payload(_get_workpaper_repository().staff_review_summary())
+
+
 def _workpaper_database_url() -> str | None:
     return os.environ.get("CIVICPROCURE_WORKPAPER_DB_URL")
+
+
+def _staff_api_key() -> str | None:
+    return os.environ.get("CIVICPROCURE_STAFF_API_KEY")
 
 
 def _get_workpaper_repository() -> ProcureWorkpaperRepository:
@@ -231,9 +406,90 @@ def _dispose_workpaper_repository() -> None:
         _workpaper_repository = None
 
 
-def _stored_rfp_response(stored: StoredRfpDraft) -> dict[str, object]:
-    return {**stored.__dict__, "created_at": stored.created_at.isoformat()}
+def _stored_rfp_response(
+    stored: StoredRfpDraft, *, staff_review: StaffReviewQueueItem | None = None
+) -> dict[str, object]:
+    return {
+        **stored.__dict__,
+        "staff_review_id": None if staff_review is None else staff_review.review_id,
+        "created_at": stored.created_at.isoformat(),
+    }
 
 
-def _stored_award_packet_response(stored: StoredAwardPacket) -> dict[str, object]:
-    return {**stored.__dict__, "created_at": stored.created_at.isoformat()}
+def _stored_award_packet_response(
+    stored: StoredAwardPacket, *, staff_review: StaffReviewQueueItem | None = None
+) -> dict[str, object]:
+    return {
+        **stored.__dict__,
+        "staff_review_id": None if staff_review is None else staff_review.review_id,
+        "created_at": stored.created_at.isoformat(),
+    }
+
+
+def _require_persistence_configured() -> None:
+    if _workpaper_database_url() is None:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "CivicProcure staff review persistence is not configured.",
+                "fix": "Set CIVICPROCURE_WORKPAPER_DB_URL before using staff review queue routes.",
+            },
+        )
+
+
+def _require_staff_role(role: str | None, staff_key: str | None) -> None:
+    expected_key = _staff_api_key()
+    if expected_key is None:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "CivicProcure staff API key is not configured.",
+                "fix": "Set CIVICPROCURE_STAFF_API_KEY before using staff-only routes.",
+            },
+        )
+    if role not in {"staff", "service"}:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "message": "Staff role required for this CivicProcure endpoint.",
+                "fix": "Send X-CivicProcure-Role: staff or service from a trusted workflow.",
+            },
+        )
+    if staff_key != expected_key:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "message": "Valid CivicProcure staff key required.",
+                "fix": "Send X-CivicProcure-Staff-Key with the configured staff API key.",
+            },
+        )
+
+
+def _staff_review_payload(item: StaffReviewQueueItem) -> dict[str, object]:
+    return {
+        "review_id": item.review_id,
+        "solicitation_id": item.solicitation_id,
+        "procurement_title": item.procurement_title,
+        "status": item.status,
+        "reason": item.reason,
+        "assigned_to": item.assigned_to,
+        "resolution": item.resolution,
+        "created_by": item.created_by,
+        "created_at": item.created_at.isoformat(),
+        "updated_at": item.updated_at.isoformat(),
+        "visibility": item.visibility,
+        "boundary": (
+            "Staff review queues support procurement triage only; they do not evaluate vendors, "
+            "award contracts, submit procurements, provide legal advice, or update a procurement system of record."
+        ),
+    }
+
+
+def _staff_review_summary_payload(summary: StaffReviewSummary) -> dict[str, object]:
+    return {
+        "total_items": summary.total_items,
+        "by_status": summary.by_status,
+        "open_items": summary.open_items,
+        "generated_at": summary.generated_at.isoformat(),
+        "visibility": summary.visibility,
+    }

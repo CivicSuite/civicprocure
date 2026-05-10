@@ -2,13 +2,13 @@
 
 ## For Non-Technical Users
 
-CivicProcure helps city staff keep solicitation drafts, proposal notes, exception flags, scoring summaries, board memo inputs, and award-packet records organized. It can draft a sample RFP outline, scaffold proposal comparison rows, flag common exception language, build a scoring summary, and assemble an award-packet checklist.
+CivicProcure helps city staff keep solicitation drafts, proposal notes, exception flags, scoring summaries, staff review queues, board memo inputs, CivicClerk/CivicContracts context references, and award-packet records organized. It can draft an RFP outline, scaffold proposal comparison rows, flag common exception language, build a scoring summary, and assemble an award-packet checklist.
 
-Current state: `0.1.1` procurement support foundation release. CivicProcure can optionally save generated RFP drafts and award-packet checklists when IT configures a workpaper database. CivicProcure does not provide official vendor evaluation decisions, legal advice, live vendor portals, live LLM calls, e-procurement submission portals, awards, or procurement system-of-record updates. Staff own every decision.
+Current state: `1.0.0` procurement support and staff review queue runtime. CivicProcure can optionally save generated RFP drafts, award-packet checklists, and staff review queue records when IT configures a workpaper database. Staff-only review routes also require `CIVICPROCURE_STAFF_API_KEY`. CivicProcure does not provide official vendor evaluation decisions, legal advice, live vendor portals, live LLM calls, e-procurement submission portals, award decisions, or procurement system-of-record updates. Staff own every decision.
 
 ## For IT and Technical Staff
 
-CivicProcure is a FastAPI Python package pinned to `civiccore==0.3.0`. The current runtime exposes:
+CivicProcure is a FastAPI Python package pinned to the published `civiccore v1.0.0` release wheel. The current runtime exposes:
 
 - `GET /`
 - `GET /health`
@@ -20,12 +20,19 @@ CivicProcure is a FastAPI Python package pinned to `civiccore==0.3.0`. The curre
 - `POST /api/v1/civicprocure/scoring/summary`
 - `POST /api/v1/civicprocure/award-packet`
 - `GET /api/v1/civicprocure/award-packet/{packet_id}`
+- `POST /api/v1/civicprocure/context/procurement-review`
+- `POST /api/v1/civicprocure/integrations/mock/procurement-context`
+- `POST /api/v1/civicprocure/staff/reviews`
+- `GET /api/v1/civicprocure/staff/reviews`
+- `PATCH /api/v1/civicprocure/staff/reviews/{review_id}`
+- `GET /api/v1/civicprocure/staff/reviews/summary`
 
-Optional persistence is controlled by `CIVICPROCURE_WORKPAPER_DB_URL`. Use a SQLAlchemy-compatible database URL such as SQLite for local rehearsal or Postgres for a shared review environment. If this variable is absent, CivicProcure still drafts support artifacts, but retrieval endpoints return setup instructions instead of pretending a database exists.
+Optional persistence is controlled by `CIVICPROCURE_WORKPAPER_DB_URL`. Staff queue routes also require `CIVICPROCURE_STAFF_API_KEY`, `X-CivicProcure-Role: staff` or `service`, and `X-CivicProcure-Staff-Key` matching the configured key.
 
 Run:
 
 ```bash
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0/civiccore-1.0.0-py3-none-any.whl
 python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh
@@ -35,11 +42,13 @@ bash scripts/verify-release.sh
 
 ```mermaid
 flowchart LR
-  Staff["Purchasing / finance / department leads"] --> CivicProcure["CivicProcure"]
-  CivicProcure --> CivicCore["CivicCore v0.3.0"]
-  CivicProcure -. future contract links .-> CivicContracts["CivicContracts"]
-  CivicProcure --> Workpapers["Optional RFP / award workpaper database"]
+  Staff["Purchasing / finance / department leads"] --> CivicProcure["CivicProcure v1.0.0"]
+  CivicProcure --> CivicCore["CivicCore v1.0.0"]
+  CivicProcure -. released context ID .-> CivicClerk["CivicClerk v1.0.0"]
+  CivicProcure -. future context ID .-> CivicContracts["CivicContracts"]
+  CivicProcure --> Queue["Staff review queue"]
+  CivicProcure --> Workpapers["RFP / award workpaper database"]
   CivicProcure --> Export["Award packet checklist"]
 ```
 
-CivicProcure depends on CivicCore. CivicCore does not depend on CivicProcure. CivicProcure v0.1.1 uses deterministic sample procurement data and optional local workpaper persistence only; live vendor portals, CivicContracts links, staff review queues, and production procurement-system integrations are future work.
+CivicProcure depends on CivicCore. CivicCore does not depend on CivicProcure. CivicProcure v1.0.0 uses deterministic sample procurement data plus optional staff-gated persistence, review-required context packets for CivicClerk/CivicContracts references, staff review queue records, and adversarial local mocks for integration-depth validation.

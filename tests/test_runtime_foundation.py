@@ -1,3 +1,6 @@
+import tomllib
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 import civicprocure
@@ -5,10 +8,23 @@ from civicprocure.main import app
 
 
 client = TestClient(app)
+ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_package_version_is_011() -> None:
-    assert civicprocure.__version__ == "0.1.1"
+def test_package_version_is_100() -> None:
+    assert civicprocure.__version__ == "1.0.0"
+
+
+def test_pyproject_uses_published_civiccore_release_wheel() -> None:
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    dependencies = data["project"]["dependencies"]
+
+    assert data["tool"]["hatch"]["metadata"]["allow-direct-references"] is True
+    assert (
+        "civiccore @ https://github.com/CivicSuite/civiccore/releases/download/"
+        "v1.0/civiccore-1.0.0-py3-none-any.whl"
+    ) in dependencies
+    assert "civiccore==1.0.0" not in dependencies
 
 
 def test_root_endpoint_states_runtime_boundary() -> None:
@@ -17,12 +33,13 @@ def test_root_endpoint_states_runtime_boundary() -> None:
     payload = response.json()
 
     assert payload["name"] == "CivicProcure"
-    assert payload["version"] == "0.1.1"
+    assert payload["version"] == "1.0.0"
     assert payload["status"] == "procurement support foundation"
-    assert "database-backed RFP/award workpapers" in payload["message"]
+    assert "staff review queues" in payload["message"]
+    assert "CivicClerk/CivicContracts context packets" in payload["message"]
     assert "official vendor evaluation decisions" in payload["message"]
-    assert "not implemented yet" in payload["message"]
-    assert payload["next_step"].startswith("Post-v0.1.1 roadmap")
+    assert "not implemented" in payload["message"]
+    assert payload["next_step"].startswith("Configure CIVICPROCURE_WORKPAPER_DB_URL")
 
 
 def test_health_endpoint_reports_versions() -> None:
@@ -32,5 +49,15 @@ def test_health_endpoint_reports_versions() -> None:
 
     assert payload["status"] == "ok"
     assert payload["service"] == "civicprocure"
-    assert payload["version"] == "0.1.1"
-    assert payload["civiccore_version"] == "0.3.0"
+    assert payload["version"] == "1.0.0"
+    assert payload["civiccore_version"] == "1.0.0"
+
+
+def test_release_gate_prefers_native_unix_python_before_windows_launcher() -> None:
+    script = (ROOT / "scripts" / "verify-release.sh").read_text(encoding="utf-8")
+
+    python3_probe = "command -v python3"
+    python_probe = "command -v python)"
+    assert python3_probe in script
+    assert python_probe in script
+    assert script.index(python3_probe) < script.index(python_probe)
