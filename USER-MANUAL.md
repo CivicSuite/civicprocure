@@ -27,12 +27,12 @@ CivicProcure is a FastAPI Python package pinned to the published `civiccore v1.0
 - `PATCH /api/v1/civicprocure/staff/reviews/{review_id}`
 - `GET /api/v1/civicprocure/staff/reviews/summary`
 
-Optional persistence is controlled by `CIVICPROCURE_WORKPAPER_DB_URL`. Staff queue routes also require `CIVICPROCURE_STAFF_API_KEY`, `X-CivicProcure-Role: staff` or `service`, and `X-CivicProcure-Staff-Key` matching the configured key.
+Optional persistence is controlled by `CIVICPROCURE_WORKPAPER_DB_URL`. Staff queue routes also require `CIVICPROCURE_STAFF_API_KEY`, `X-CivicProcure-Role: staff`, and `X-CivicProcure-Staff-Key` matching the configured key. CivicProcure uses CivicCore `staff_key_gate` for timing-safe key comparison.
 
 Run:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
 python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh
