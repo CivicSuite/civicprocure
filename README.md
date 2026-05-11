@@ -31,7 +31,7 @@ Current state: **v0.2.0 procurement support and staff review queue runtime**. Th
 CivicProcure installs against the published CivicCore v1.0.0 release wheel:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.0.1/civiccore-1.0.1-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
 ```
 
 ## API Surface
@@ -67,7 +67,7 @@ Set `CIVICPROCURE_STAFF_API_KEY` before using staff-only review routes:
 export CIVICPROCURE_STAFF_API_KEY="replace-with-city-secret"
 ```
 
-Staff routes require `X-CivicProcure-Role: staff` or `service` and `X-CivicProcure-Staff-Key` matching the configured key. Without persistence, CivicProcure remains deterministic and stateless. Retrieval and staff-only endpoints return actionable `503` responses that name the required configuration.
+Staff routes require `X-CivicProcure-Role: staff` and `X-CivicProcure-Staff-Key` matching the configured key. CivicProcure uses CivicCore `staff_key_gate` for timing-safe key comparison. Without persistence, CivicProcure remains deterministic and stateless. Retrieval and staff-only endpoints return actionable `503` responses that name the required configuration.
 
 ## Local Development
 
