@@ -1,6 +1,6 @@
 # Browser QA - Production-Depth Procure Workpaper Persistence
 
-URL: file:///C:/Users/scott/OneDrive/Desktop/Claude/civicprocure/docs/index.html
+URL: docs/index.html
 
 ## Assertions
 - Desktop screenshot captured: PASS

@@ -2,7 +2,7 @@
 
 CivicProcure is the CivicSuite module for procurement RFP drafting, proposal comparison, exception extraction, scoring summaries, board memo inputs, staff review queues, review-required CivicClerk/CivicContracts context packets, adversarial local integration mocks, and award-packet checklists.
 
-Current state: **v0.2.0 procurement support and staff review queue runtime**. This repo ships a FastAPI package aligned to the published CivicCore v1.0.0 release wheel, health/root endpoints, documentation gates, deterministic and database-backed RFP drafting, award-packet workpapers, staff-only review queue workflows, review-required CivicClerk/CivicContracts procurement context packets, adversarial local integration mocks, proposal comparison scaffolds, exception extraction, scoring summary helper, award-packet checklist, and accessible public sample UI at `/civicprocure`. It does **not** ship live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, award decisions, or procurement system-of-record integrations.
+Current state: **v0.2.0 procurement support and staff review queue runtime**. This repo ships a FastAPI package aligned to the published CivicCore v1.2.0 release wheel, health/root endpoints, documentation gates, deterministic and database-backed RFP drafting, award-packet workpapers, staff-only review queue workflows, review-required CivicClerk/CivicContracts procurement context packets, adversarial local integration mocks, proposal comparison scaffolds, exception extraction, scoring summary helper, award-packet checklist, and accessible public sample UI at `/civicprocure`. It does **not** ship live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, award decisions, or procurement system-of-record integrations.
 
 ## What CivicProcure Does
 
@@ -28,10 +28,10 @@ Current state: **v0.2.0 procurement support and staff review queue runtime**. Th
 
 ## CivicCore Dependency
 
-CivicProcure installs against the published CivicCore v1.0.0 release wheel:
+CivicProcure installs against the published CivicCore v1.2.0 release wheel:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl
 ```
 
 ## API Surface

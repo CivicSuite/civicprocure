@@ -8,7 +8,7 @@ Current state: 0.2.0 procurement support and staff review queue runtime. CivicPr
 
 ## For IT and Technical Staff
 
-CivicProcure is a FastAPI Python package pinned to the published `civiccore v1.0.0` release wheel. The current runtime exposes:
+CivicProcure is a FastAPI Python package pinned to the published `civiccore v1.2.0` release wheel. The current runtime exposes:
 
 - `GET /`
 - `GET /health`
@@ -32,7 +32,7 @@ Optional persistence is controlled by `CIVICPROCURE_WORKPAPER_DB_URL`. Staff que
 Run:
 
 ```bash
-python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.1.0/civiccore-1.1.0-py3-none-any.whl
+python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl
 python -m pip install -e ".[dev]"
 python -m pytest -q
 bash scripts/verify-release.sh
@@ -43,7 +43,7 @@ bash scripts/verify-release.sh
 ```mermaid
 flowchart LR
   Staff["Purchasing / finance / department leads"] --> CivicProcure["CivicProcure v0.2.0"]
-  CivicProcure --> CivicCore["CivicCore v1.0.0"]
+  CivicProcure --> CivicCore["CivicCore v1.2.0"]
   CivicProcure -. released context ID .-> CivicClerk["CivicClerk v1.0.0"]
   CivicProcure -. future context ID .-> CivicContracts["CivicContracts"]
   CivicProcure --> Queue["Staff review queue"]
