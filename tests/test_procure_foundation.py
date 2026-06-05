@@ -100,6 +100,27 @@ def test_procurement_support_apis_success_shape() -> None:
     assert packet.json()["solicitation_id"] == "rfp-2026-001"
 
 
+def test_rfp_draft_validation_is_actionable() -> None:
+    missing = client.post(
+        "/api/v1/civicprocure/rfps/draft",
+        json={"procurement_title": "Bridge design RFP", "procurement_type": "professional services"},
+    )
+    oversized = client.post(
+        "/api/v1/civicprocure/rfps/draft",
+        json={
+            "procurement_title": "Bridge design RFP",
+            "procurement_type": "professional services",
+            "city_need": "x" * 8001,
+        },
+    )
+
+    assert missing.status_code == 200
+    assert missing.json()["recommended_owner"] == "Department lead + Legal + Purchasing"
+    assert oversized.status_code == 422
+    assert oversized.json()["detail"]["fields"] == ["city_need"]
+    assert "required field names" in oversized.json()["detail"]["fix"]
+
+
 def test_public_ui_route_is_accessible_and_honest() -> None:
     response = client.get("/civicprocure")
     assert response.status_code == 200
