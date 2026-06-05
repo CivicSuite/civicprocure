@@ -35,6 +35,7 @@ required=(
   "civicprocure/award_packet.py"
   "civicprocure/integration_mocks.py"
   "civicprocure/persistence.py"
+  "civicprocure/db_admin.py"
   "civicprocure/public_ui.py"
 )
 

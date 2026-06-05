@@ -27,6 +27,13 @@ def test_pyproject_uses_published_civiccore_release_wheel() -> None:
     assert "civiccore==1.0.0" not in dependencies
 
 
+def test_pyproject_exposes_operator_database_scripts() -> None:
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    scripts = data["project"]["scripts"]
+    assert scripts["civicprocure-db-status"] == "civicprocure.db_admin:main"
+
+
 def test_root_endpoint_states_runtime_boundary() -> None:
     response = client.get("/")
     assert response.status_code == 200
@@ -40,6 +47,7 @@ def test_root_endpoint_states_runtime_boundary() -> None:
     assert "official vendor evaluation decisions" in payload["message"]
     assert "not implemented" in payload["message"]
     assert payload["next_step"].startswith("Configure CIVICPROCURE_WORKPAPER_DB_URL")
+    assert "/ready" in payload["next_step"]
 
 
 def test_health_endpoint_reports_versions() -> None:

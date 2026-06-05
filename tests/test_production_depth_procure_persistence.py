@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+import subprocess
+import sys
 
 from fastapi.testclient import TestClient
 
@@ -33,6 +35,69 @@ def test_repository_persists_rfp_and_award_packet(tmp_path: Path) -> None:
     assert reloaded.get_award_packet(packet.packet_id).solicitation_id == "rfp-2026-001"
     reloaded.engine.dispose()
     db_path.unlink()
+
+
+def test_workpaper_repository_records_schema_status(tmp_path: Path) -> None:
+    db_path = tmp_path / "schema-status.db"
+    repo = ProcureWorkpaperRepository(db_url=f"sqlite+pysqlite:///{db_path.as_posix()}")
+    try:
+        status = repo.schema_status()
+    finally:
+        repo.engine.dispose()
+
+    assert status.ready is True
+    assert status.schema_version == status.expected_schema_version
+    assert status.missing_tables == ()
+
+
+def test_db_status_cli_reports_ready_schema(tmp_path: Path) -> None:
+    db_path = tmp_path / "cli-status.db"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "civicprocure.db_admin",
+            "--db-url",
+            f"sqlite+pysqlite:///{db_path.as_posix()}",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "CivicProcure schema ready" in result.stdout
+
+
+def test_readiness_requires_configured_workpaper_database(monkeypatch) -> None:
+    monkeypatch.delenv("CIVICPROCURE_WORKPAPER_DB_URL", raising=False)
+    _dispose_workpaper_repository()
+
+    response = client.get("/api/v1/civicprocure/readiness")
+
+    payload = response.json()
+    assert payload["status"] == "not-ready"
+    assert payload["ready"] is False
+    assert payload["workpaper_database_configured"] is False
+    assert "CIVICPROCURE_WORKPAPER_DB_URL" in payload["blockers"][0]
+
+
+def test_readiness_passes_with_configured_workpaper_database(monkeypatch, tmp_path: Path) -> None:
+    db_path = tmp_path / "ready-runtime.db"
+    monkeypatch.setenv(
+        "CIVICPROCURE_WORKPAPER_DB_URL", f"sqlite+pysqlite:///{db_path.as_posix()}"
+    )
+    _dispose_workpaper_repository()
+
+    try:
+        response = client.get("/ready")
+    finally:
+        _dispose_workpaper_repository()
+        monkeypatch.delenv("CIVICPROCURE_WORKPAPER_DB_URL")
+
+    payload = response.json()
+    assert payload["status"] == "ready"
+    assert payload["ready"] is True
+    assert payload["schema_ready"] is True
 
 
 def test_procure_persistence_api_round_trip(monkeypatch, tmp_path: Path) -> None:

@@ -110,12 +110,12 @@ def root() -> dict[str, str]:
             "CivicProcure package, API foundation, sample RFP drafting, proposal comparison, "
             "exception extraction helper, scoring summary helper, award-packet checklist, "
             "optional database-backed RFP/award workpapers, staff review queues, review-required "
-            "CivicClerk/CivicContracts context packets, adversarial local integration mocks, and public UI foundation are online; "
+            "CivicClerk/CivicContracts context packets, adversarial local integration mocks, readiness gate, and public UI foundation are online; "
             "live vendor portals, official vendor evaluation decisions, "
             "legal advice, live LLM calls, e-procurement submission portals, award decisions, and procurement system-of-record integrations "
             "are not implemented."
         ),
-        "next_step": "Configure CIVICPROCURE_WORKPAPER_DB_URL and CIVICPROCURE_STAFF_API_KEY before using staff queues.",
+        "next_step": "Configure CIVICPROCURE_WORKPAPER_DB_URL and verify /ready before public use.",
     }
 
 
@@ -129,6 +129,16 @@ def health() -> dict[str, str]:
         "version": __version__,
         "civiccore_version": CIVICCORE_VERSION,
     }
+
+
+@app.get("/ready")
+def ready() -> dict[str, object]:
+    return _readiness_payload()
+
+
+@app.get("/api/v1/civicprocure/readiness")
+def readiness() -> dict[str, object]:
+    return _readiness_payload()
 
 
 @app.get("/civicprocure", response_class=HTMLResponse)
@@ -453,4 +463,34 @@ def _staff_review_summary_payload(summary: StaffReviewSummary) -> dict[str, obje
         "open_items": summary.open_items,
         "generated_at": summary.generated_at.isoformat(),
         "visibility": summary.visibility,
+    }
+
+
+def _readiness_payload() -> dict[str, object]:
+    db_url = _workpaper_database_url()
+    if db_url is None:
+        return {
+            "status": "not-ready",
+            "ready": False,
+            "workpaper_database_configured": False,
+            "schema_ready": False,
+            "schema_version": None,
+            "expected_schema_version": None,
+            "blockers": ["Set CIVICPROCURE_WORKPAPER_DB_URL to a local workpaper database."],
+        }
+
+    repository = _get_workpaper_repository()
+    schema_status = repository.schema_status()
+    blockers: list[str] = []
+    if not schema_status.ready:
+        blockers.append("Initialize the CivicProcure workpaper database schema with civicprocure-db-status.")
+    ready_for_public_use = not blockers
+    return {
+        "status": "ready" if ready_for_public_use else "not-ready",
+        "ready": ready_for_public_use,
+        "workpaper_database_configured": True,
+        "schema_ready": schema_status.ready,
+        "schema_version": schema_status.schema_version,
+        "expected_schema_version": schema_status.expected_schema_version,
+        "blockers": blockers,
     }

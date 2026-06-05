@@ -4,6 +4,7 @@
 
 - Aligned the current CivicProcure runtime dependency and current-facing docs to the published CivicCore v1.2.0 release wheel.
 - Wired the public `/civicprocure` draft workflow to the local RFP draft API and safe DOM rendering.
+- Added schema status and readiness gates for the local workpaper database.
 
 ## [0.2.0] - 2026-05-11
 

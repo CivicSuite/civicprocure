@@ -29,6 +29,8 @@ CivicProcure is a FastAPI Python package pinned to the published `civiccore v1.2
 
 Optional persistence is controlled by `CIVICPROCURE_WORKPAPER_DB_URL`. Staff queue routes also require `CIVICPROCURE_STAFF_API_KEY`, `X-CivicProcure-Role: staff`, and `X-CivicProcure-Staff-Key` matching the configured key. CivicProcure uses CivicCore `staff_key_gate` for timing-safe key comparison.
 
+Use `civicprocure-db-status` to initialize/check the local workpaper schema. `/ready` and `/api/v1/civicprocure/readiness` remain not-ready until `CIVICPROCURE_WORKPAPER_DB_URL` is configured.
+
 Run:
 
 ```bash

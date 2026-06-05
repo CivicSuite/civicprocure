@@ -19,6 +19,9 @@ dependencies = [
   "uvicorn[standard]>=0.30.0,<1.0.0",
 ]
 
+[project.scripts]
+civicprocure-db-status = "civicprocure.db_admin:main"
+
 [tool.hatch.metadata]
 allow-direct-references = true
 

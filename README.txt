@@ -12,6 +12,8 @@ Staff routes require CIVICPROCURE_WORKPAPER_DB_URL plus CIVICPROCURE_STAFF_API_K
 - X-CivicProcure-Role: staff or service
 - X-CivicProcure-Staff-Key: configured staff key
 
+Use civicprocure-db-status to initialize/check schema. /ready remains not-ready until the workpaper database is configured.
+
 Local development:
 
 python -m pip install https://github.com/CivicSuite/civiccore/releases/download/v1.2.0/civiccore-1.2.0-py3-none-any.whl

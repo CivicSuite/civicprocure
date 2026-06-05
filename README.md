@@ -38,6 +38,8 @@ python -m pip install https://github.com/CivicSuite/civiccore/releases/download/
 
 - `GET /` returns the shipped/planned boundary.
 - `GET /health` returns package and CivicCore versions.
+- `GET /ready` returns workpaper database readiness for installer and operator checks.
+- `GET /api/v1/civicprocure/readiness` returns detailed schema readiness.
 - `GET /civicprocure` returns the accessible public sample UI.
 - `POST /api/v1/civicprocure/rfps/draft` returns sample RFP drafting and a `staff_review_id` when persistence is configured.
 - `GET /api/v1/civicprocure/rfps/draft/{draft_id}` retrieves a persisted RFP draft when workpaper persistence is configured.
@@ -55,7 +57,7 @@ python -m pip install https://github.com/CivicSuite/civiccore/releases/download/
 
 ## Optional Workpaper Persistence And Staff Queue
 
-Set `CIVICPROCURE_WORKPAPER_DB_URL` to a SQLAlchemy database URL to store generated RFP drafts, award-packet checklists, and staff review queue records:
+Set `CIVICPROCURE_WORKPAPER_DB_URL` to a SQLAlchemy database URL to store generated RFP drafts, award-packet checklists, and staff review queue records. Use `civicprocure-db-status` to initialize/check schema. `/ready` remains not-ready until the workpaper database is configured.
 
 ```bash
 export CIVICPROCURE_WORKPAPER_DB_URL="sqlite+pysqlite:///./civicprocure.db"

@@ -13,7 +13,9 @@ CivicProcure does not provide official vendor evaluation decisions, legal advice
 For IT and Technical Staff
 --------------------------
 
-CivicProcure is a FastAPI Python package pinned to the published civiccore v1.2.0 release wheel. It exposes RFP draft, proposal comparison, exception extraction, scoring summary, award packet, procurement-review context, adversarial local mock, and staff review queue endpoints.
+CivicProcure is a FastAPI Python package pinned to the published civiccore v1.2.0 release wheel. It exposes RFP draft, proposal comparison, exception extraction, scoring summary, award packet, procurement-review context, adversarial local mock, staff review queue, and readiness endpoints.
+
+Use civicprocure-db-status to initialize/check the local workpaper schema. /ready and /api/v1/civicprocure/readiness remain not-ready until CIVICPROCURE_WORKPAPER_DB_URL is configured.
 
 Run:
 

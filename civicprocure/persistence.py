@@ -12,6 +12,15 @@ from civicprocure.rfp_draft import draft_rfp_outline
 
 
 metadata = sa.MetaData()
+SCHEMA_VERSION = "2026-06-05-001"
+
+schema_migrations = sa.Table(
+    "schema_migrations",
+    metadata,
+    sa.Column("schema_version", sa.String(80), primary_key=True),
+    sa.Column("applied_at", sa.DateTime(timezone=True), nullable=False),
+    schema="civicprocure",
+)
 
 rfp_draft_records = sa.Table(
     "rfp_draft_records",
@@ -107,6 +116,15 @@ class StaffReviewSummary:
     visibility: str = "staff_only"
 
 
+@dataclass(frozen=True)
+class SchemaStatus:
+    schema_version: str | None
+    expected_schema_version: str
+    ready: bool
+    missing_tables: tuple[str, ...]
+    dialect: str
+
+
 class ProcureWorkpaperRepository:
     def __init__(self, *, db_url: str | None = None, engine: Engine | None = None) -> None:
         base_engine = engine or create_engine(db_url or "sqlite+pysqlite:///:memory:", future=True)
@@ -116,7 +134,51 @@ class ProcureWorkpaperRepository:
             self.engine = base_engine
             with self.engine.begin() as connection:
                 connection.execute(sa.text("CREATE SCHEMA IF NOT EXISTS civicprocure"))
+        self.migrate()
+
+    def migrate(self) -> SchemaStatus:
         metadata.create_all(self.engine)
+        with self.engine.begin() as connection:
+            exists = connection.execute(
+                sa.select(schema_migrations.c.schema_version).where(
+                    schema_migrations.c.schema_version == SCHEMA_VERSION
+                )
+            ).first()
+            if exists is None:
+                connection.execute(
+                    schema_migrations.insert().values(
+                        schema_version=SCHEMA_VERSION,
+                        applied_at=datetime.now(UTC),
+                    )
+                )
+        return self.schema_status()
+
+    def schema_status(self) -> SchemaStatus:
+        inspector = sa.inspect(self.engine)
+        translated_schema = None if self.engine.dialect.name == "sqlite" else "civicprocure"
+        available_tables = set(inspector.get_table_names(schema=translated_schema))
+        expected_tables = {
+            "rfp_draft_records",
+            "award_packet_records",
+            "staff_review_queue_records",
+            "schema_migrations",
+        }
+        missing_tables = tuple(sorted(expected_tables - available_tables))
+        schema_version = None
+        if "schema_migrations" not in missing_tables:
+            with self.engine.begin() as connection:
+                schema_version = connection.execute(
+                    sa.select(schema_migrations.c.schema_version)
+                    .order_by(schema_migrations.c.applied_at.desc())
+                    .limit(1)
+                ).scalar_one_or_none()
+        return SchemaStatus(
+            schema_version=schema_version,
+            expected_schema_version=SCHEMA_VERSION,
+            ready=schema_version == SCHEMA_VERSION and not missing_tables,
+            missing_tables=missing_tables,
+            dialect=self.engine.dialect.name,
+        )
 
     def create_rfp_draft(
         self, *, procurement_title: str, procurement_type: str, city_need: str
