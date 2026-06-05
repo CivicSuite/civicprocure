@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Aligned the current CivicProcure runtime dependency and current-facing docs to the published CivicCore v1.2.0 release wheel.
+- Wired the public `/civicprocure` draft workflow to the local RFP draft API and safe DOM rendering.
 
 ## [0.2.0] - 2026-05-11
 

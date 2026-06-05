@@ -110,3 +110,12 @@ def test_public_ui_route_is_accessible_and_honest() -> None:
     assert "v0.2.0 procurement support + staff review queues" in text
     assert "does not evaluate vendors" in text
     assert "procurement system of record" in text
+
+
+def test_public_ui_uses_local_rfp_api_without_html_injection_sink() -> None:
+    text = client.get("/civicprocure").text
+
+    assert 'fetch("/api/v1/civicprocure/rfps/draft"' in text
+    assert "result.innerHTML" not in text
+    assert "textContent" in text
+    assert 'id="draft-button"' in text

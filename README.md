@@ -15,7 +15,7 @@ Current state: **v0.2.0 procurement support and staff review queue runtime**. Th
 - Route procurement review work through staff-only queue endpoints protected by `CIVICPROCURE_STAFF_API_KEY`.
 - Carry CivicClerk, CivicContracts, and solicitation context IDs into review-required packets without calling those systems live.
 - Validate adversarial local integration mocks for spoofed roles, official evaluation attempts, award-decision attempts, submission attempts, legal-advice claims, stale context, and live vendor-portal claims.
-- Demonstrate a public procurement-support UI at `/civicprocure`.
+- Demonstrate an API-backed public procurement-support UI at `/civicprocure`.
 
 ## What CivicProcure Does Not Do
 
