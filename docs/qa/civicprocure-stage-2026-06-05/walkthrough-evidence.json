@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-06-05T23:15:38.621Z",
+  "base": "http://127.0.0.1:18172",
+  "checks": [
+    {
+      "name": "public-desktop",
+      "status": 200,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "heading": "Draft ready for staff review",
+      "itemCount": 6,
+      "resultText": "Draft ready for staff review\nPurpose and background: Professional services procurement for bridge inspection and design support; proposals include exceptions and insurance notes.\nScope of work and deliverables.\nMinimum qualifications and submission requirements.\nEvaluation criteria and scoring process.\nRequired terms, insurance, records, and public-procurement disclosures.\nTentative schedule and award-approval path.\n\nCivicProcure provides procurement-support drafts only. Staff own every decision; the module does not evaluate vendors, award contracts, provide legal advice, submit procurements, or replace the procurement system of record.",
+      "overflow": false,
+      "consoleMessages": [],
+      "requestFailures": [],
+      "screenshot": "C:/dev/Claude/civicprocure/docs/qa/civicprocure-stage-2026-06-05/public-desktop.png"
+    },
+    {
+      "name": "public-mobile",
+      "status": 200,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "heading": "Draft ready for staff review",
+      "itemCount": 6,
+      "resultText": "Draft ready for staff review\nPurpose and background: Professional services procurement for bridge inspection and design support; proposals include exceptions and insurance notes.\nScope of work and deliverables.\nMinimum qualifications and submission requirements.\nEvaluation criteria and scoring process.\nRequired terms, insurance, records, and public-procurement disclosures.\nTentative schedule and award-approval path.\n\nCivicProcure provides procurement-support drafts only. Staff own every decision; the module does not evaluate vendors, award contracts, provide legal advice, submit procurements, or replace the procurement system of record.",
+      "overflow": false,
+      "consoleMessages": [],
+      "requestFailures": [],
+      "screenshot": "C:/dev/Claude/civicprocure/docs/qa/civicprocure-stage-2026-06-05/public-mobile.png"
+    },
+    {
+      "name": "api-/",
+      "status": 200,
+      "body": "{\"name\":\"CivicProcure\",\"version\":\"0.2.0\",\"status\":\"procurement support foundation\",\"message\":\"CivicProcure package, API foundation, sample RFP drafting, proposal comparison, exception extraction helper, scoring summary helper, award-packet checklist, optional database-backed RFP/award workpapers, staff review queues, review-required CivicClerk/CivicContracts context packets, adversarial local integration mocks, readiness gate, and public UI foundation are online; live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, award decisions, and procurement system-of-record integrations are not implemented.\",\"next_step\":\"Configure CIVICPROCURE_WORKPAPER_DB_URL and verify /ready before public use.\"}"
+    },
+    {
+      "name": "api-/health",
+      "status": 200,
+      "body": "{\"status\":\"ok\",\"service\":\"civicprocure\",\"version\":\"0.2.0\",\"civiccore_version\":\"1.2.0\"}"
+    },
+    {
+      "name": "api-/ready",
+      "status": 200,
+      "body": "{\"status\":\"not-ready\",\"ready\":false,\"workpaper_database_configured\":false,\"schema_ready\":false,\"schema_version\":null,\"expected_schema_version\":null,\"blockers\":[\"Set CIVICPROCURE_WORKPAPER_DB_URL to a local workpaper database.\"]}"
+    },
+    {
+      "name": "api-/api/v1/civicprocure/readiness",
+      "status": 200,
+      "body": "{\"status\":\"not-ready\",\"ready\":false,\"workpaper_database_configured\":false,\"schema_ready\":false,\"schema_version\":null,\"expected_schema_version\":null,\"blockers\":[\"Set CIVICPROCURE_WORKPAPER_DB_URL to a local workpaper database.\"]}"
+    },
+    {
+      "name": "api-rfp-valid",
+      "status": 200,
+      "body": {
+        "procurement_title": "Bridge design RFP",
+        "procurement_type": "professional services",
+        "recommended_owner": "Department lead + Legal + Purchasing",
+        "sections": [
+          "Purpose and background: Bridge inspection and design support.",
+          "Scope of work and deliverables.",
+          "Minimum qualifications and submission requirements.",
+          "Evaluation criteria and scoring process.",
+          "Required terms, insurance, records, and public-procurement disclosures.",
+          "Tentative schedule and award-approval path."
+        ],
+        "disclaimer": "CivicProcure provides procurement-support drafts only. Staff own every decision; the module does not evaluate vendors, award contracts, provide legal advice, submit procurements, or replace the procurement system of record.",
+        "draft_id": null,
+        "staff_review_id": null
+      }
+    },
+    {
+      "name": "api-rfp-invalid",
+      "status": 422,
+      "body": {
+        "detail": {
+          "message": "CivicProcure could not validate: city_need.",
+          "fix": "Send a JSON body with the required field names listed in the fields array. Keep text fields within documented bounds and use booleans for yes/no inputs.",
+          "fields": [
+            "city_need"
+          ]
+        }
+      }
+    }
+  ]
+}
