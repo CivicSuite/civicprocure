@@ -1,6 +1,7 @@
 """FastAPI runtime foundation for CivicProcure."""
 
 import os
+from pathlib import Path
 
 from civiccore import __version__ as CIVICCORE_VERSION
 from civiccore.auth import staff_key_gate
@@ -10,11 +11,10 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from civicprocure import __version__
-from civicprocure.award_packet import build_award_packet_checklist
 from civicprocure.exception_extract import extract_proposal_exceptions
 from civicprocure.integration_mocks import validate_procurement_context_mocks
 from civicprocure.proposal_compare import compare_proposals
-from civicprocure.public_ui import render_public_lookup_page
+from civicprocure.public_ui import render_public_lookup_page, render_staff_page
 from civicprocure.rfp_draft import draft_rfp_outline
 from civicprocure.scoring_summary import build_scoring_summary
 from civicprocure.persistence import (
@@ -106,17 +106,17 @@ def root() -> dict[str, str]:
     return {
         "name": "CivicProcure",
         "version": __version__,
-        "status": "procurement support foundation",
+        "status": "local-first procurement support plus staff review queues",
         "message": (
             "CivicProcure package, API foundation, sample RFP drafting, proposal comparison, "
             "exception extraction helper, scoring summary helper, award-packet checklist, "
-            "optional database-backed RFP/award workpapers, staff review queues, review-required "
+            "local-first database-backed RFP/award workpapers, staff review queues, review-required "
             "CivicClerk/CivicContracts context packets, adversarial local integration mocks, readiness gate, and public UI foundation are online; "
             "live vendor portals, official vendor evaluation decisions, "
             "legal advice, live LLM calls, e-procurement submission portals, award decisions, and procurement system-of-record integrations "
             "are not implemented."
         ),
-        "next_step": "Configure CIVICPROCURE_WORKPAPER_DB_URL and verify /ready before public use.",
+        "next_step": "Open /civicprocure/staff for staff review queues, verify /ready, and route award packets before official action.",
     }
 
 
@@ -149,42 +149,74 @@ def public_civicprocure_page() -> str:
     return render_public_lookup_page()
 
 
+@app.get("/civicprocure/staff", response_class=HTMLResponse)
+def staff_civicprocure_page() -> str:
+    """Return the staff procurement review queue UI."""
+
+    return render_staff_page()
+
+
+@app.get("/api/v1/civicprocure/integration-contracts")
+def integration_contracts() -> dict[str, object]:
+    """Return suite-visible integration contracts for installer and downstream checks."""
+
+    return {
+        "module": "civicprocure",
+        "version": __version__,
+        "contracts": [
+            {
+                "name": "civicprocure.rfp_draft.v1",
+                "endpoint": "/api/v1/civicprocure/rfps/draft",
+                "method": "POST",
+                "boundary": "Creates draft procurement workpapers; it does not publish solicitations.",
+            },
+            {
+                "name": "civicprocure.staff_review_queue.v1",
+                "endpoint": "/api/v1/civicprocure/staff/reviews",
+                "method": "GET",
+                "requires_staff_key": True,
+                "boundary": "Staff-only queue for procurement review, exceptions, and award follow-up.",
+            },
+            {
+                "name": "civicprocure.award_packet.v1",
+                "endpoint": "/api/v1/civicprocure/award-packet",
+                "method": "POST",
+                "boundary": "Builds award workpapers; it does not make award decisions.",
+            },
+            {
+                "name": "civicprocure.procurement_context.v1",
+                "endpoint": "/api/v1/civicprocure/context/procurement-review",
+                "method": "POST",
+                "boundary": "Carries CivicClerk, CivicContracts, and solicitation context IDs for staff review.",
+            },
+        ],
+        "downstream_ready_for": [
+            "civicgrants grant-funded procurement packages",
+            "civiccontracts contract drafting",
+            "civicclerk agenda award memos",
+            "civicrecords-ai procurement file retention",
+        ],
+    }
+
+
 @app.post("/api/v1/civicprocure/rfps/draft")
 def rfp_draft(request: RfpDraftRequest) -> dict[str, object]:
-    if _workpaper_database_url() is not None:
-        stored = _get_workpaper_repository().create_rfp_draft(
-            procurement_title=request.procurement_title,
-            procurement_type=request.procurement_type,
-            city_need=request.city_need,
-        )
-        staff_review = _get_workpaper_repository().create_staff_review_queue_item(
-            procurement_title=stored.procurement_title,
-            solicitation_id=stored.draft_id,
-            reason="RFP draft requires staff review before publication, proposal evaluation, or award action.",
-            created_by="staff",
-        )
-        return _stored_rfp_response(stored, staff_review=staff_review)
-    result = draft_rfp_outline(
+    stored = _get_workpaper_repository().create_rfp_draft(
         procurement_title=request.procurement_title,
         procurement_type=request.procurement_type,
         city_need=request.city_need,
     )
-    payload = result.__dict__
-    payload["draft_id"] = None
-    payload["staff_review_id"] = None
-    return payload
+    staff_review = _get_workpaper_repository().create_staff_review_queue_item(
+        procurement_title=stored.procurement_title,
+        solicitation_id=stored.draft_id,
+        reason="RFP draft requires staff review before publication, proposal evaluation, or award action.",
+        created_by="staff",
+    )
+    return _stored_rfp_response(stored, staff_review=staff_review)
 
 
 @app.get("/api/v1/civicprocure/rfps/draft/{draft_id}")
 def get_rfp_draft(draft_id: str) -> dict[str, object]:
-    if _workpaper_database_url() is None:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "CivicProcure workpaper persistence is not configured.",
-                "fix": "Set CIVICPROCURE_WORKPAPER_DB_URL to retrieve persisted RFP drafts.",
-            },
-        )
     stored = _get_workpaper_repository().get_rfp_draft(draft_id)
     if stored is None:
         raise HTTPException(
@@ -226,40 +258,22 @@ def scoring_summary(request: ScoringSummaryRequest) -> dict[str, object]:
 
 @app.post("/api/v1/civicprocure/award-packet")
 def award_packet(request: AwardPacketRequest) -> dict[str, object]:
-    if _workpaper_database_url() is not None:
-        stored = _get_workpaper_repository().create_award_packet(
-            solicitation_id=request.solicitation_id,
-            title=request.title,
-            format=request.format,
-        )
-        staff_review = _get_workpaper_repository().create_staff_review_queue_item(
-            procurement_title=stored.title,
-            solicitation_id=stored.solicitation_id,
-            reason="Award packet requires staff review before governing-body action or contract routing.",
-            created_by="staff",
-        )
-        return _stored_award_packet_response(stored, staff_review=staff_review)
-    result = build_award_packet_checklist(
+    stored = _get_workpaper_repository().create_award_packet(
         solicitation_id=request.solicitation_id,
         title=request.title,
         format=request.format,
     )
-    payload = result.__dict__
-    payload["packet_id"] = None
-    payload["staff_review_id"] = None
-    return payload
+    staff_review = _get_workpaper_repository().create_staff_review_queue_item(
+        procurement_title=stored.title,
+        solicitation_id=stored.solicitation_id,
+        reason="Award packet requires staff review before governing-body action or contract routing.",
+        created_by="staff",
+    )
+    return _stored_award_packet_response(stored, staff_review=staff_review)
 
 
 @app.get("/api/v1/civicprocure/award-packet/{packet_id}")
 def get_award_packet(packet_id: str) -> dict[str, object]:
-    if _workpaper_database_url() is None:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "CivicProcure workpaper persistence is not configured.",
-                "fix": "Set CIVICPROCURE_WORKPAPER_DB_URL to retrieve persisted award-packet records.",
-            },
-        )
     stored = _get_workpaper_repository().get_award_packet(packet_id)
     if stored is None:
         raise HTTPException(
@@ -408,15 +422,22 @@ async def validation_exception_handler(_request: object, exc: RequestValidationE
     )
 
 
-def _workpaper_database_url() -> str | None:
-    return os.environ.get("CIVICPROCURE_WORKPAPER_DB_URL")
+def _workpaper_database_url() -> str:
+    configured = os.environ.get("CIVICPROCURE_WORKPAPER_DB_URL")
+    if configured:
+        return configured
+    data_dir = Path(os.environ.get("CIVICPROCURE_DATA_DIR", Path.cwd() / "data")).resolve()
+    data_dir.mkdir(parents=True, exist_ok=True)
+    return f"sqlite+pysqlite:///{(data_dir / 'civicprocure-workpapers.db').as_posix()}"
+
+
+def _uses_default_workpaper_database() -> bool:
+    return not os.environ.get("CIVICPROCURE_WORKPAPER_DB_URL")
 
 
 def _get_workpaper_repository() -> ProcureWorkpaperRepository:
     global _workpaper_db_url, _workpaper_repository
     db_url = _workpaper_database_url()
-    if db_url is None:
-        raise RuntimeError("CIVICPROCURE_WORKPAPER_DB_URL is not configured.")
     if _workpaper_repository is None or db_url != _workpaper_db_url:
         _dispose_workpaper_repository()
         _workpaper_db_url = db_url
@@ -494,17 +515,6 @@ def _staff_review_summary_payload(summary: StaffReviewSummary) -> dict[str, obje
 
 def _readiness_payload() -> dict[str, object]:
     db_url = _workpaper_database_url()
-    if db_url is None:
-        return {
-            "status": "not-ready",
-            "ready": False,
-            "workpaper_database_configured": False,
-            "schema_ready": False,
-            "schema_version": None,
-            "expected_schema_version": None,
-            "blockers": ["Set CIVICPROCURE_WORKPAPER_DB_URL to a local workpaper database."],
-        }
-
     repository = _get_workpaper_repository()
     schema_status = repository.schema_status()
     blockers: list[str] = []
@@ -515,6 +525,8 @@ def _readiness_payload() -> dict[str, object]:
         "status": "ready" if ready_for_public_use else "not-ready",
         "ready": ready_for_public_use,
         "workpaper_database_configured": True,
+        "workpaper_database_url": db_url,
+        "using_default_local_database": _uses_default_workpaper_database(),
         "schema_ready": schema_status.ready,
         "schema_version": schema_status.schema_version,
         "expected_schema_version": schema_status.expected_schema_version,

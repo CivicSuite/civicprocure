@@ -41,12 +41,12 @@ def test_root_endpoint_states_runtime_boundary() -> None:
 
     assert payload["name"] == "CivicProcure"
     assert payload["version"] == "0.2.0"
-    assert payload["status"] == "procurement support foundation"
+    assert payload["status"] == "local-first procurement support plus staff review queues"
     assert "staff review queues" in payload["message"]
     assert "CivicClerk/CivicContracts context packets" in payload["message"]
     assert "official vendor evaluation decisions" in payload["message"]
     assert "not implemented" in payload["message"]
-    assert payload["next_step"].startswith("Configure CIVICPROCURE_WORKPAPER_DB_URL")
+    assert payload["next_step"].startswith("Open /civicprocure/staff")
     assert "/ready" in payload["next_step"]
 
 

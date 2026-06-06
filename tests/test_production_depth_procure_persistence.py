@@ -68,17 +68,20 @@ def test_db_status_cli_reports_ready_schema(tmp_path: Path) -> None:
     assert "CivicProcure schema ready" in result.stdout
 
 
-def test_readiness_requires_configured_workpaper_database(monkeypatch) -> None:
+def test_readiness_uses_default_local_workpaper_database(monkeypatch) -> None:
     monkeypatch.delenv("CIVICPROCURE_WORKPAPER_DB_URL", raising=False)
     _dispose_workpaper_repository()
 
     response = client.get("/api/v1/civicprocure/readiness")
 
     payload = response.json()
-    assert payload["status"] == "not-ready"
-    assert payload["ready"] is False
-    assert payload["workpaper_database_configured"] is False
-    assert "CIVICPROCURE_WORKPAPER_DB_URL" in payload["blockers"][0]
+    assert payload["status"] == "ready"
+    assert payload["ready"] is True
+    assert payload["workpaper_database_configured"] is True
+    assert payload["using_default_local_database"] is True
+    assert payload["schema_ready"] is True
+    assert payload["blockers"] == []
+    assert "civicprocure-workpapers.db" in payload["workpaper_database_url"]
 
 
 def test_readiness_passes_with_configured_workpaper_database(monkeypatch, tmp_path: Path) -> None:
@@ -232,11 +235,19 @@ def test_staff_review_queue_lifecycle_is_staff_gated_and_persistent(monkeypatch,
     db_path.unlink()
 
 
-def test_staff_review_queue_requires_persistence_configuration(monkeypatch) -> None:
+def test_default_local_database_supports_staff_review_queue(monkeypatch) -> None:
     monkeypatch.delenv("CIVICPROCURE_WORKPAPER_DB_URL", raising=False)
     monkeypatch.setenv("CIVICPROCURE_STAFF_API_KEY", "test-staff-key")
     _dispose_workpaper_repository()
 
+    rfp = client.post(
+        "/api/v1/civicprocure/rfps/draft",
+        json={
+            "procurement_title": "Default local RFP",
+            "procurement_type": "professional services",
+            "city_need": "Local workpaper persistence needs review.",
+        },
+    )
     response = client.get(
         "/api/v1/civicprocure/staff/reviews",
         headers={"X-CivicProcure-Role": "staff", "X-CivicProcure-Staff-Key": "test-staff-key"},
@@ -244,16 +255,21 @@ def test_staff_review_queue_requires_persistence_configuration(monkeypatch) -> N
 
     monkeypatch.delenv("CIVICPROCURE_STAFF_API_KEY")
 
-    assert response.status_code == 503
-    assert "Set CIVICPROCURE_WORKPAPER_DB_URL" in response.json()["detail"]["fix"]
+    assert rfp.status_code == 200
+    assert rfp.json()["draft_id"]
+    assert rfp.json()["staff_review_id"]
+    assert response.status_code == 200
+    items = response.json()["items"]
+    assert len(items) == 1
+    assert items[0]["procurement_title"] == "Default local RFP"
 
 
-def test_get_rfp_without_persistence_returns_actionable_503(monkeypatch) -> None:
+def test_get_rfp_missing_default_local_id_returns_actionable_404(monkeypatch) -> None:
     monkeypatch.delenv("CIVICPROCURE_WORKPAPER_DB_URL", raising=False)
     _dispose_workpaper_repository()
     response = client.get("/api/v1/civicprocure/rfps/draft/example")
-    assert response.status_code == 503
-    assert "Set CIVICPROCURE_WORKPAPER_DB_URL" in response.json()["detail"]["fix"]
+    assert response.status_code == 404
+    assert "POST /api/v1/civicprocure/rfps/draft" in response.json()["detail"]["fix"]
 
 
 def test_get_award_packet_missing_id_returns_actionable_404(monkeypatch, tmp_path: Path) -> None:

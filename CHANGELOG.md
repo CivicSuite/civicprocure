@@ -6,6 +6,7 @@
 - Wired the public `/civicprocure` draft workflow to the local RFP draft API and safe DOM rendering.
 - Added schema status and readiness gates for the local workpaper database.
 - Added bounded API request validation with actionable 422 responses.
+- Made CivicProcure local-first by default with a SQLite workpaper data directory, persisted RFP/award/staff review flows, staff UI at `/civicprocure/staff`, and suite integration contract metadata.
 
 ## [0.2.0] - 2026-05-11
 
