@@ -1,0 +1,190 @@
+{
+  "baseUrl": "http://127.0.0.1:18172",
+  "checks": [
+    {
+      "name": "public-ui-draft-click",
+      "status": "ok",
+      "text": "Draft ready for staff review\nPurpose and background: Professional services procurement for bridge inspection and design support; proposals include exceptions and insurance notes.\nScope of work and deliverables.\nMinimum qualifications and submission requirements.\nEvaluation criteria and scoring process.\nRequired terms, insurance, records, and public-procurement disclosures.\nTentative schedule and award-approval path.\n\nCivicProcure provides procurement-support drafts only. Staff own every decision; the module does not evaluate vendors, award contracts, provide legal advice, submit procurements, or replace the procurement system of record."
+    },
+    {
+      "name": "staff-ui-keyless-error-state",
+      "status": "ok",
+      "text": "Set CIVICPROCURE_STAFF_API_KEY before using staff-only routes."
+    },
+    {
+      "name": "root",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "name": "CivicProcure",
+        "version": "0.2.0",
+        "status": "local-first procurement support plus staff review queues",
+        "message": "CivicProcure package, API foundation, sample RFP drafting, proposal comparison, exception extraction helper, scoring summary helper, award-packet checklist, local-first database-backed RFP/award workpapers, staff review queues, review-required CivicClerk/CivicContracts context packets, adversarial local integration mocks, readiness gate, and public UI foundation are online; live vendor portals, official vendor evaluation decisions, legal advice, live LLM calls, e-procurement submission portals, award decisions, and procurement system-of-record integrations are not implemented.",
+        "next_step": "Open /civicprocure/staff for staff review queues, verify /ready, and route award packets before official action."
+      }
+    },
+    {
+      "name": "ready",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "status": "ready",
+        "ready": true,
+        "workpaper_database_configured": true,
+        "workpaper_database_url": "sqlite+pysqlite:///C:/dev/Claude/civicprocure/.tmp-walkthrough-data/civicprocure-workpapers.db",
+        "using_default_local_database": true,
+        "schema_ready": true,
+        "schema_version": "2026-06-05-001",
+        "expected_schema_version": "2026-06-05-001",
+        "blockers": []
+      }
+    },
+    {
+      "name": "integration-contracts",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "module": "civicprocure",
+        "version": "0.2.0",
+        "contracts": [
+          {
+            "name": "civicprocure.rfp_draft.v1",
+            "endpoint": "/api/v1/civicprocure/rfps/draft",
+            "method": "POST",
+            "boundary": "Creates draft procurement workpapers; it does not publish solicitations."
+          },
+          {
+            "name": "civicprocure.staff_review_queue.v1",
+            "endpoint": "/api/v1/civicprocure/staff/reviews",
+            "method": "GET",
+            "requires_staff_key": true,
+            "boundary": "Staff-only queue for procurement review, exceptions, and award follow-up."
+          },
+          {
+            "name": "civicprocure.award_packet.v1",
+            "endpoint": "/api/v1/civicprocure/award-packet",
+            "method": "POST",
+            "boundary": "Builds award workpapers; it does not make award decisions."
+          },
+          {
+            "name": "civicprocure.procurement_context.v1",
+            "endpoint": "/api/v1/civicprocure/context/procurement-review",
+            "method": "POST",
+            "boundary": "Carries CivicClerk, CivicContracts, and solicitation context IDs for staff review."
+          }
+        ],
+        "downstream_ready_for": [
+          "civicgrants grant-funded procurement packages",
+          "civiccontracts contract drafting",
+          "civicclerk agenda award memos",
+          "civicrecords-ai procurement file retention"
+        ]
+      }
+    },
+    {
+      "name": "rfp-create",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "draft_id": "3ce491ac-6a17-480d-a6de-83bc00e4a5cc",
+        "procurement_title": "Walkthrough bridge RFP",
+        "procurement_type": "professional services",
+        "recommended_owner": "Department lead + Legal + Purchasing",
+        "sections": [
+          "Purpose and background: Walkthrough inspection and design support.",
+          "Scope of work and deliverables.",
+          "Minimum qualifications and submission requirements.",
+          "Evaluation criteria and scoring process.",
+          "Required terms, insurance, records, and public-procurement disclosures.",
+          "Tentative schedule and award-approval path."
+        ],
+        "disclaimer": "CivicProcure provides procurement-support drafts only. Staff own every decision; the module does not evaluate vendors, award contracts, provide legal advice, submit procurements, or replace the procurement system of record.",
+        "created_at": "2026-06-06T20:33:48.386752+00:00",
+        "staff_review_id": "15609d76-f4ca-49ad-b525-e106926e5a60"
+      }
+    },
+    {
+      "name": "rfp-fetch",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "draft_id": "3ce491ac-6a17-480d-a6de-83bc00e4a5cc",
+        "procurement_title": "Walkthrough bridge RFP",
+        "procurement_type": "professional services",
+        "recommended_owner": "Department lead + Legal + Purchasing",
+        "sections": [
+          "Purpose and background: Walkthrough inspection and design support.",
+          "Scope of work and deliverables.",
+          "Minimum qualifications and submission requirements.",
+          "Evaluation criteria and scoring process.",
+          "Required terms, insurance, records, and public-procurement disclosures.",
+          "Tentative schedule and award-approval path."
+        ],
+        "disclaimer": "CivicProcure provides procurement-support drafts only. Staff own every decision; the module does not evaluate vendors, award contracts, provide legal advice, submit procurements, or replace the procurement system of record.",
+        "created_at": "2026-06-06T20:33:48.386752",
+        "staff_review_id": null
+      }
+    },
+    {
+      "name": "award-packet-create",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "packet_id": "be54080a-1462-42bd-b6d7-60f10e14d103",
+        "solicitation_id": "3ce491ac-6a17-480d-a6de-83bc00e4a5cc",
+        "title": "Walkthrough bridge award",
+        "format": "markdown",
+        "checklist": [
+          "Preserve solicitation, addenda, Q&A, and publication/posting evidence.",
+          "Preserve proposal register, evaluation worksheets, conflict disclosures, and exceptions.",
+          "Preserve staff recommendation, board memo, award action, and signed agreement.",
+          "Preserve records-request notes and retention classification for the procurement file."
+        ],
+        "retention_note": "Keep procurement records according to municipal retention schedule and solicitation terms.",
+        "created_at": "2026-06-06T20:33:48.408035+00:00",
+        "staff_review_id": "0d72a14c-dbad-48d6-842a-63bf9a88d9d4"
+      }
+    },
+    {
+      "name": "award-packet-fetch",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "packet_id": "be54080a-1462-42bd-b6d7-60f10e14d103",
+        "solicitation_id": "3ce491ac-6a17-480d-a6de-83bc00e4a5cc",
+        "title": "Walkthrough bridge award",
+        "format": "markdown",
+        "checklist": [
+          "Preserve solicitation, addenda, Q&A, and publication/posting evidence.",
+          "Preserve proposal register, evaluation worksheets, conflict disclosures, and exceptions.",
+          "Preserve staff recommendation, board memo, award action, and signed agreement.",
+          "Preserve records-request notes and retention classification for the procurement file."
+        ],
+        "retention_note": "Keep procurement records according to municipal retention schedule and solicitation terms.",
+        "created_at": "2026-06-06T20:33:48.408035",
+        "staff_review_id": null
+      }
+    },
+    {
+      "name": "context",
+      "status": 200,
+      "ok": true,
+      "body": {
+        "solicitation_id": "walkthrough-rfp",
+        "procurement_title": "Walkthrough bridge RFP",
+        "solicitation_context_id": "",
+        "clerk_context_id": "clerk-ctx",
+        "contract_context_id": "contract-ctx",
+        "source_date_status": "current",
+        "citations": [
+          "Procurement draft context: Purchasing / finance",
+          "CivicClerk context: clerk-ctx",
+          "CivicContracts context: contract-ctx"
+        ],
+        "recommended_owner": "Purchasing / finance",
+        "review_required": true,
+        "boundary": "CivicProcure provides procurement review context only; it is not an official vendor evaluation, award decision, legal opinion, procurement submission, live vendor-portal result, or procurement system-of-record action."
+      }
+    }
+  ]
+}
